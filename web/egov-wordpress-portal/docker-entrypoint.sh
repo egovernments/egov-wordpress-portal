@@ -235,6 +235,12 @@ $mysql->close();
 EOPHP
 	fi
 
+if [ -d /var/www/html/wp-content ]; then
+	mv /var/www/html/wp-content /var/www/html/wp-content_default
+fi
+
+ln -s /opt/eGov/egov-wordpress-portal/wp-content /var/www/html/wp-content
+
 	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
 	for e in "${envs[@]}"; do
 		unset "$e"
@@ -242,9 +248,3 @@ EOPHP
 fi
 
 exec "$@"
-
-if [ -d /var/www/html/wp-content ]; then
-	mv /var/www/html/wp-content /var/www/html/wp-content_default
-fi
-
-ln -s /opt/eGov/egov-wordpress-portal/wp-content /var/www/html/wp-content
