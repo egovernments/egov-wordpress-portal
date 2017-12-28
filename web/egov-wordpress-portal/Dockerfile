@@ -1,4 +1,4 @@
-FROM egovio/wordpress:4.9.1-php7.2-apache
+FROM egovio/wordpress:4.9.1-php5.6-apache
 
 ENV DATA_DIR=/opt/eGov/egov-wordpress-portal
 RUN mkdir -p ${DATA_DIR}
