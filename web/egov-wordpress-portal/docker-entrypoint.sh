@@ -192,6 +192,11 @@ EOPHP
 			set_config 'WP_DEBUG' 1 boolean
 		fi
 
+		if [ "$WORDPRESS_SITEURL" ]; then
+			echo "define('WP_HOME','$WORDPRESS_SITEURL');" >> wp-config.php
+			echo "define('WP_SITEURL','$WORDPRESS_SITEURL');" >> wp-config.php
+		fi
+
 		TERM=dumb php -- <<'EOPHP'
 <?php
 // database might not exist, so let's try creating it (just to be safe)
@@ -240,6 +245,7 @@ if [ -d /var/www/html/wp-content ]; then
 fi
 
 ln -s /opt/eGov/egov-wordpress-portal/wp-content /var/www/html/wp-content
+
 
 	# now that we're definitely done writing configuration, let's clear out the relevant envrionment variables (so that stray "phpinfo()" calls don't leak secrets from our code)
 	for e in "${envs[@]}"; do
