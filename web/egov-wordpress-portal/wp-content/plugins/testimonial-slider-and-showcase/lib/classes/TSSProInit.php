@@ -11,7 +11,8 @@ if ( ! class_exists( 'TSSProInit' ) ):
 			register_deactivation_hook( TSS_PLUGIN_ACTIVE_FILE_NAME, array( $this, 'deactivate' ) );
 			add_action( 'plugins_loaded', array( $this, 'plugin_loaded' ) );
 			add_action( 'wp_ajax_tssSettingsAction', array( $this, 'tssSettingsUpdate' ) );
-			add_filter( 'plugin_action_links_' . TSS_PLUGIN_ACTIVE_FILE_NAME, array($this, 'rt_plugin_active_link_marketing') );
+			add_filter( 'plugin_action_links_' . TSS_PLUGIN_ACTIVE_FILE_NAME,
+				array( $this, 'rt_plugin_active_link_marketing' ) );
 		}
 
 		public function activate() {
@@ -93,24 +94,24 @@ if ( ! class_exists( 'TSSProInit' ) ):
 			TSSPro()->doFlush();
 
 			// register scripts
-			$scripts                       = array();
-			$styles                        = array();
-			$scripts['tss-owl-carousel']   = array(
+			$scripts                      = array();
+			$styles                       = array();
+			$scripts['tss-owl-carousel']  = array(
 				'src'    => TSSPro()->assetsUrl . 'vendor/owl-carousel/owl.carousel.min.js',
 				'deps'   => array( 'jquery' ),
 				'footer' => false
 			);
-			$scripts['tss-image-load']     = array(
+			$scripts['tss-image-load']    = array(
 				'src'    => TSSPro()->assetsUrl . 'js/imagesloaded.pkgd.min.js',
 				'deps'   => array( 'jquery' ),
 				'footer' => false
 			);
-			$scripts['tss-actual-height']  = array(
+			$scripts['tss-actual-height'] = array(
 				'src'    => TSSPro()->assetsUrl . 'vendor/actual-height/jquery.actual.min.js',
 				'deps'   => array( 'jquery' ),
 				'footer' => false
 			);
-			$scripts['tss']                = array(
+			$scripts['tss']               = array(
 				'src'    => TSSPro()->assetsUrl . 'js/testimonial-slider.js',
 				'deps'   => array( 'jquery' ),
 				'footer' => true
@@ -153,7 +154,8 @@ if ( ! class_exists( 'TSSProInit' ) ):
 			}
 
 			foreach ( $scripts as $handel => $script ) {
-				wp_register_script( $handel, $script['src'], $script['deps'], time(), $script['footer'] ); // TODO replaced time() function
+				wp_register_script( $handel, $script['src'], $script['deps'], time(),
+					$script['footer'] ); // TODO replaced time() function
 			}
 
 			foreach ( $styles as $k => $v ) {
@@ -252,9 +254,10 @@ if ( ! class_exists( 'TSSProInit' ) ):
 		}
 
 
-		public function rt_plugin_active_link_marketing($links){
-			$links[] = '<a target="_blank" href="'. esc_url( 'http://demo.radiustheme.com/wordpress/plugins/testimonials-slider/' ) .'">Demo</a>';
-			$links[] = '<a target="_blank" href="'. esc_url( 'https://www.radiustheme.com/setup-wp-testimonials-slider-showcase-wordpress/' ) .'">Documentation</a>';
+		public function rt_plugin_active_link_marketing( $links ) {
+			$links[] = '<a target="_blank" href="' . esc_url( 'http://demo.radiustheme.com/wordpress/plugins/testimonials-slider/' ) . '">Demo</a>';
+			$links[] = '<a target="_blank" href="' . esc_url( 'https://www.radiustheme.com/setup-wp-testimonials-slider-showcase-wordpress/' ) . '">Documentation</a>';
+
 //			$links[] = '<a target="_blank" href="'. esc_url( 'https://radiustheme.com/tlp-team-pro-for-wordpress/' ) .'">Get Pro</a>';
 			return $links;
 		}

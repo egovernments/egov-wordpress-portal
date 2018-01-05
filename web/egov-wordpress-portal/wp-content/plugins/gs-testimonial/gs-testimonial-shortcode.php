@@ -61,13 +61,10 @@ function gs_testimonial_shortcode() {
 				$output .= '<div class="box-image"><img src="'. $gs_testimonial .'" alt="'. $gs_testimonial_alt .'"></div>';
 
 				if($meta['gs_t_client_company'][0]){
-
 					$output .= '<div class="box-companyname"><span>Company Name:</span> '. $meta['gs_t_client_company'][0] .'</div>';
-
 				}
 
 				if($meta['gs_t_client_design'][0]){
-
 					$output .= '<div class="box-designation"><span>Designation:</span> '. $meta['gs_t_client_design'][0] .'</div>';
 				}
 				$output .= '</div></div>';

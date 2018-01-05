@@ -6,7 +6,7 @@ Email: diana@burduja.eu
 Tags: CSS, JS, javascript, custom CSS, custom JS, custom style, site css, add style, customize theme, custom code, external css, css3, style, styles, stylesheet, theme, editor, design, admin
 Requires at least: 3.0.1
 Tested up to: 4.9
-Stable tag: 3.8 
+Stable tag: 3.10 
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -115,13 +115,25 @@ $. Add/Edit HTML
 
 == Changelog ==
 
+= 3.10 =
+* Fix: https://wordpress.org/support/topic/broken-layout-of-code-snippet-type-color-tag-css-html-js-on-main-list-table/
+* Feature: add filter by code type
+* Feature: make the 'Modified' column sortable
+* Fix: if the default comment remains in the "Add Custom JS", then there was no <script> tags added to the code, as the comment contained a <script> tag
+
+= 3.9 =
+* 12/01/2017
+* Feature: add "Last edited ..." information under the editor
+* Fix: jump to line when searching
+* Tweak: add message that the Code Revision data is dummy
+
 = 3.8 =
 * 10/19/2017
 * Declare compatibility with WooCommerce 3.2 (https://woocommerce.wordpress.com/2017/08/28/new-version-check-in-woocommerce-3-2/)
 * Fix: avoid conflicts with other plugins that implement the CodeMirror editor
 * Update the CodeMirror library to 5.28 version
 
-= 3.7
+= 3.7 =
 * 10/06/2017
 * Add French and Polish translation
 

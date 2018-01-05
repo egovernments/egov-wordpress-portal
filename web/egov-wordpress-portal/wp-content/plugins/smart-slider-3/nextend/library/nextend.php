@@ -31,8 +31,9 @@ class N2 {
                 if (N2Settings::get('curl-clean-proxy', 0)) {
                     curl_setopt($ch, CURLOPT_PROXY, '');
                 }
-                $data = curl_exec($ch);
-                if (curl_errno($ch) == 60) {
+                $data        = curl_exec($ch);
+                $errorNumber = curl_errno($ch);
+                if ($errorNumber == 60 || $errorNumber == 77) {
                     curl_setopt($ch, CURLOPT_CAINFO, N2LIBRARY . '/cacert.pem');
                     $data = curl_exec($ch);
                 }
@@ -84,6 +85,25 @@ class N2 {
         }
 
         switch ($contentType) {
+            case 'text/html; charset=UTF-8':
+                //CloudFlare challenge
+                preg_match('/"your_ip">.*?:[ ]*(.*?)<\/span>/', $data, $matches);
+                if (count($matches)) {
+                    $blockedIP = $matches[1];
+
+                    N2Message::error(sprintf('Your ip address (%s) is blocked by our hosting provider.<br>Please contact us (support@nextendweb.com) with your ip to whitelist it.', $blockedIP));
+
+                    return array(
+                        'status' => 'ERROR_HANDLED'
+                    );
+                }
+
+                N2Message::error(sprintf('Unexpected response from the API.<br>Please contact us (support@nextendweb.com) with the following log:') . '<br><textarea style="width: 100%;height:200px;font-size:8px;">' . base64_encode($data) . '</textarea>');
+
+                return array(
+                    'status' => 'ERROR_HANDLED'
+                );
+                break;
             case 'application/json':
                 return json_decode($data, true);
         }

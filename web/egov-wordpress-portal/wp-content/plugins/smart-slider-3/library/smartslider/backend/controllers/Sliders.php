@@ -85,7 +85,7 @@ class N2SmartsliderBackendSlidersController extends N2SmartSliderController {
             $zip->addFile(file_get_contents($file), basename($file));
             unlink($file);
         }
-        ob_end_clean();
+        n2_ob_end_clean_all();
         header('Content-disposition: attachment; filename=sliders_unzip_to_import.zip');
         header('Content-type: application/zip');
         echo $zip->file();
@@ -182,18 +182,20 @@ class N2SmartsliderBackendSlidersController extends N2SmartSliderController {
     
     }
 
-    public function actionHidePromoLike() {
-        if ($this->validateToken()) {
-            $this->appType->app->storage->set('free', 'promoLike', 1);
-        }
-        $this->redirectToSliders();
-    }
-
     public function actionHidePromoUpgrade() {
         if ($this->validateToken()) {
             $this->appType->app->storage->set('free', 'promoUpgrade', 1);
         }
     
+        $this->redirectToSliders();
+    }
+
+    public function actionHideReview() {
+
+        if ($this->validateToken()) {
+            $this->appType->app->storage->set('free', 'review', 1);
+        }
+
         $this->redirectToSliders();
     }
 }

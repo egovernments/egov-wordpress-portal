@@ -8,10 +8,10 @@
  * @copyright 2015 Golam Samdani
  *
  * @wordpress-plugin
- * Plugin Name:			GS Testimonial
+ * Plugin Name:			GS Testimonial Lite
  * Plugin URI:			http://www.gsamdani.com/wordpress-plugins
  * Description:       	Best Responsive Testimonials slider to display client's testimonials / recommendations. Display anywhere at your site using shortcode like [gs_testimonial] Check more shortcode examples and documention at <a href="http://testimonial.gsamdani.com">GS Testimonial Pro Docs</a> 
- * Version:           	1.0.5
+ * Version:           	1.7
  * Author:       		Golam Samdani
  * Author URI:       	http://www.gsamdani.com
  * Text Domain:       	golamsamdani
@@ -24,25 +24,13 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-
-//--------- CPT Testimonial ----------------------- 
 require_once dirname( __FILE__ ) . '/gs-testimonial-cpt.php';
-
-
-//--------- CPT's MetaBox ------------------ 
 require_once dirname( __FILE__ ) . '/gs-testimonial-metabox.php';
-
-
-//--------- CPT's Columns ------------------ 
 require_once dirname( __FILE__ ) . '/gs-testimonial-column.php';
-
-
-//--------- CPT's Shortcode ---------------- 
 require_once dirname( __FILE__ ) . '/gs-testimonial-shortcode.php';
-
 require_once dirname( __FILE__ ) . '/gs-plugins/gs-plugins.php';
-
-//--------- Enqueue Scripts & Style Files --
+require_once dirname( __FILE__ ) . '/gs-plugins/gs-plugins-free.php';
+require_once dirname( __FILE__ ) . '/gs-plugins/gs-testimonial-help.php';
 require_once dirname( __FILE__ ) . '/gs-testimonial-script.php';
 
 
@@ -74,3 +62,12 @@ function gst_get_free() { ?>
 }
 //add_action('admin_notices', 'gst_get_free');
 //add_action('network_admin_notices', 'gst_get_free');
+
+if ( ! function_exists('gs_testimonial_pro_link') ) {
+	function gs_testimonial_pro_link( $gsTesti_links ) {
+		$gsTesti_links[] = '<a class="gs-pro-link" href="https://www.gsamdani.com/product/gs-testimonial-slider" target="_blank">Go Pro!</a>';
+		$gsTesti_links[] = '<a href="https://www.gsamdani.com/wordpress-plugins" target="_blank">GS Plugins</a>';
+		return $gsTesti_links;
+	}
+	add_filter( 'plugin_action_links_' .plugin_basename(__FILE__), 'gs_testimonial_pro_link' );
+}

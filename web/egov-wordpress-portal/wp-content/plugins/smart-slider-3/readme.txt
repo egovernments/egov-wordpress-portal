@@ -2,9 +2,9 @@
 Contributors: nextendweb
 Tags: slider, gallery slider, image slider, layer slider, responsive slider, slideshow, fullwidth slider, post slider, horizontal slider, vertical slider, photo slider, video slider
 Donate link: https://sites.fastspring.com/nextend/product/smartslider3donate
-Requires at least: 4.0
-Tested up to: 4.8.2
-Stable tag: 3.2.8
+Requires at least: 4.6
+Tested up to: 4.9
+Stable tag: 3.2.12
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -204,6 +204,65 @@ Of course! Smart Slider use protocol relative urls which works fine on http:// a
 9. Layer slider with layers styles. Made with FREE version.
 
 == Changelog ==
+
+= 3.2.12 - 14. December 2017. =
+* Feature: Smart Slider 3 in-app rating. Every feedback helps us to measure how we are doing :)
+* Feature: Custom Smart Slider field for Advanced Custom Fields plugin
+* Feature: Option to disable Slider shortcode when YOAST SEO generates XML sitemap
+* Feature: Images from subfolders date ordering
+* Feature: Web-Dorado Photo Gallery variables for non-images
+* Feature: Generator variables for Content, Row and Column backgrounds and URLs.
+* Feature: Simple type main animation now use transform for the animation
+* Fix: Background video and YouTube autoplays for supported mobiles (playsinline and muted)
+* Fix: Image from folder generator's ordering by file name
+* Fix: Proper loading of slider when fade on load setting disabled
+* Fix: Server side mobile detect fix in rare cases
+* Fix: Thumbnail border fix
+* Fix: Disable WordPress emoji in page builders preview
+
+= 3.2.10 - 23. November 2017. =
+* Feature: The Youtube and Vimeo layers will stop if you scroll away from them and they will continue when you scroll back
+* Feature: The free version's Image layer will have width and height settings too
+* Feature: Joomla article generator image variables
+* Feature: Base64 removed from async
+* Feature: Elementor will auto open the slider selector
+* Feature: Beaver Builder 2.0 compatibility
+* Fix: Youtube certain configuration settings weren't used
+* Fix: Slide's link wasn't clickable over the text bar
+* Fix: Search in link
+* Fix: PHP7.2 deprecated create_function notice
+* Fix: Wordfence compatility
+
+= 3.2.9 - 12. October 2017. =
+* Feature: Drag and drop upload removes the image extension
+* Feature: Play when visible is available in the free version
+* Feature: Server side mobile detection
+* Feature: Single bullet will be hidden
+* Feature: Thumbnail updates on background change if the background image and thumbnail are the same
+* Feature: Fallback for image handling if the mime_content_type function isn't enabled on the server
+* Feature: Force full width overflow hidden element setting
+* Feature: Control normal flow (below and above slider positions) improvements
+* Feature: Affiliate hoplink improvements
+* Feature: Updated Google Font family list
+* Feature: Frontend accessibility parameter. Accessibility: :HOVER styles applies to :FOCUS. Not: :FOCUS state looks like the normal state
+* Feature: WordPress Unyson framework improved implementation
+* Fix: Hoplink fix
+* Fix: Base64_decode fallback when it's disabled on the server
+* Fix: Fallback when mime_content_type is disabled on the server
+* Fix: Click on one slide where touch is enabled
+* Fix: Font and style hover/normal improvements while blank links are used
+* Fix: Layer item scroll fix for IOS
+* Fix: Image URL on new layer & slide when the Protocol Relative URL is used.
+* Fix: Preserve 3D in Firefox
+* Fix: RTL behavior improvements
+* Fix: Send as file on Safari
+* Fix: Slider importing on certain servers
+* Fix: Thumbnail control arrows in Firefox
+* Fix: Links not working in certain cases
+* Fix: Down/right gradient orientation
+* Fix: Hidden col allowed to drop layers when drag on canvas
+* Fix: Layer window auto positioning removed
+* Fix: Hidden slider control was clickable
 
 = 3.2.8 - 20. September 2017. =
 * Fix: Possible cache related PHP error

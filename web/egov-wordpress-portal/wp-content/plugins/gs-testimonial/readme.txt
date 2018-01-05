@@ -1,10 +1,10 @@
 === GS Testimonial Slider ===
 Contributors: samdani
 Donate link: https://www.2checkout.com/checkout/purchase?sid=202460873&quantity=1&product_id=2
-Tags: Testimonial slider, Best testimonial slider, Responsive testimonial slider, easy testimonial slider, client testimonial slider, testimonial slider wordpress, Testimonial plugin, testimonial, testimonial rotator, gsamdani
-Requires at least: 3.3
-Tested up to: 4.8
-Stable tag: 1.0.5
+Tags: testimonial, testimonials, Testimonials, rotating, rotate testimonials, customers reviews, 5 star testimonials, testimonials slider, add testimonials, customer testimonial, customer testimonials, display testimonials, multiple testimonials, testimonials client, Testimonials Manager, testimonials shortcode, testimonials widget, widget, widgets, unlimited testimonials, testimonials with widget, testimonials plugin, random testimonials, star rating, star ratings, testimonial form, customer review, customer reviews, testimonial slider, Testimonial slider, client testimonial slider, Best testimonial slider, easy testimonial slider, responsive slider, Responsive testimonial slider, testimonial widget, testimonial feed, testimonial with shortcode, client testimonial, shortcodes, quotes, quote, recommendation, reference, feedback slider, feedback, wordpress testimonial with widget, testimonial rotator, free testimonial, content slider, testimonial carousel, customer comments, praise, premium testimonial plugin, advanced testimonial showcase plugin, advanced shortcode testimonial plugin, custom post type, custom testimonial, testimonial layouts, testimonial shortcode, testimonial showcase, user comments, simple testimonial, best testimonial, sidebar, testimonial manager, clients, client, review, customer, customers, slider, sliders, pro testimonial, testimony, witness, case studies, grid style testimonial, shortcode plugin, list style testimonial, slideshow, jquery, carousel, comments, rotator, rotators, shortcodes, rich snippets, author data, company data, rotation, testimonial slider wordpress, testimonial rotator, gsamdani, gsplugins
+Requires at least: 4
+Tested up to: 4.9
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,54 +16,87 @@ GS Testimonial Slider is a WordPress plugin which create custom post type to add
 
 GS Testimonial plugin is simple but flexible & powerful.
 
-*   [Upgrade to PRO &raquo;](http://www.gsamdani.com/product/gs-testimonial-slider)
-*   [View live Demos &raquo;](http://testimonial.gsamdani.com)
-*   [Documentations &raquo;](http://testimonial.gsamdani.com/documentation)
-*   [Support &raquo;](http://www.gsamdani.com/support)
-*   [Contact Me &raquo;](http://www.gsamdani.com/contact)
+### GS Testimonial Slider by https://www.gsamdani.com
 
+>[Live Demo](http://testimonial.gsamdani.com) | [Upgrade to PRO](https://www.gsamdani.com/product/gs-testimonial-slider) | [Documentation](http://testimonial.gsamdani.com/documentation) | [Support](https://www.gsamdani.com/support) | [Contact](https://www.gsamdani.com/contact)
 
-Plugin Features
+https://www.youtube.com/watch?v=eV39_xaYFu4
 
+### Plugin Features
+* Responsive Testimonial Slider.
 * Testimonial Shortcode Ready
-* Responsive Testimonial slider.
-* Very light weight.
+* Light Weight, Clean & Beautiful design.
 * Custom post type for Testimonial posting.
 * No need any settings.
-* Work with all Wordpress theme.
-* Easy to use.
+* Work with all WordPress theme.
+* W3C valid markup
+* Output Teasimonials anywhere with the shortcode [gs_testimonial theme=”gs_style1″]
+* Easy Install, Configuration.
+* All Major Browsers compatible
 * Developer friendly & easy to customize.
-* Powered by Cycle2.
 * Displaying Author Image with each Testimonial
 * Its easy to use interface allows you to manage, edit, create, and delete Testimonials with no new knowledge
 
-Pro Features 
-
-* 9 different Transitions
-* 9 different Themes / Styles
-* 6 Different Author image styles
+### Pro Features 
+* 20+ Predefined Testimonial Styles.
+* Front-end Submission Form.
+* Testimonial pending status for approval by Admin.
 * Tons of shortcode parameters
 * Category wise Testimonials
 * Great Settings Panel
-* Enable / Disable - Stop on Hover
-* On / Off Navigation Arrow
-* Control Sliding Speed
-* On / Off Pagination
-* Unlimited Colors & Font styling
-* Google fonts
-* Different Theming
-* Author Image size control
-* Works with any WordPress Theme.
-* Build with HTML5 & CSS3.
-* Responsive. Work on any device.
-* Easy and user-friendly setup.
+* Column wise / Full Screen /Flip Testimonial Slider.
+* Filter & Masonry Testimonial Showcase.
+* Read More option to Expand content.
+* Characters custom limit option.
+* Star Rating System.
+* Show/hide star rating.
+* 6 Different Author image styles (Square, Circle, Radius, Square Shadow, Circle Shadow, Radius Shadow)
+* 9 different Transitions
+* Show/hide Navigation arrows.
+* Testimonials Order by (date, ID, title, modified, ran)
+* Order (Descending, Ascending)
+* Set Testimonial Auto-play speed time.
+* Testimonial stop on hover.
+* Shortcodes to be used everywhere.
+* Widget Ready.
+* Used FontAwesome arrow for Previous / Next.
+* Priority Email Support.
+* Free Installation ( If needed ).
 * Well documentation and support.
+* And many more..
+
+### Available fields to add info
+* Testimonial Author Name
+* Testimonial Details
+* Testimonial Author Image
+* Company Name
+* Designation
+* Testimonial Categories
+* Star Ratings
+
+### Testimonial Settings (Pro)
+* Transition Style (carousel, fade, fadeout, scrollHorz, scrollVert, flipHorz, flipVert, shuffle, tileSlide)
+* On / off contols for – Stop on hover, Navigation Arrow, Responsiveness, Pagination, Company & Designation, Ratings, Image
+* Sliding Speed
+* Style Testimonial Texts by – Color, Font Size, line Height, Weight
+* Style Author Name by – Color, Font Size, Weight, Margin
+* Style Labels by – Color, Font Size
+* Style Name & Designation by – Color, Font Size, Weight, Font Style
+* Navigation Arrow Color. Applicable for Flipster Theme
+* Ratings Color
+* Filter Category Position. Applicable for Filter Theme
+* Font Family. Yes / No to change Hand written Author Name
+* Image Width
+* Image Height
+* Company Label. Change to your desired label text
+* Designation Label. Change to your desired label text
+* Author Image Border
+* Border Thikness
+* Border Style
+* Style & Theming
 
 
-Shortcode
-
-9 different Transitions
-
+### 9 different Transitions
 * carousel
 * fade
 * fadeout
@@ -74,7 +107,7 @@ Shortcode
 * shuffle
 * tileSlide
 
-Use any shortcode to display testimonials with preferred transition
+### Use any shortcode to display testimonials with preferred transition
 
 `[gs_testimonial transition="carousel"]`
 `[gs_testimonial transition="fade"]`
@@ -86,8 +119,7 @@ Use any shortcode to display testimonials with preferred transition
 `[gs_testimonial transition="shuffle"]`
 `[gs_testimonial transition="tileSlide"]`
 
-9 different Themes / Styles
-
+### 20 different Themes / Styles
 * gs_style1
 * gs_style2
 * gs_style3
@@ -97,9 +129,16 @@ Use any shortcode to display testimonials with preferred transition
 * gs_style7
 * gs_style8
 * gs_style9
+* none
+* gs_style11
+* gs_style12
+* gs_style13
+* gs_style14
+* gs_style15
+* gs_style16
+* gs_style17
 
-6 Different Author image styles
-
+### 6 Different Author image styles
 * gs_square
 * gs_circle
 * gs_radius
@@ -108,19 +147,26 @@ Use any shortcode to display testimonials with preferred transition
 * gs_radius_shadow
 
 
-Style - One : 
+### GS Testimonial Slider's shortcode usage
+
 Use following shortcode to display testimonials combined with Carousel transition, gs_style1 theme & gs_circle author image
 
 `[gs_testimonial transition="carousel" theme="gs_style1" img="gs_circle"]`
 
+<strong>Shortcode PHP Usage</strong>
+`
+<?php echo do_shortcode( '[gs_testimonial transition="carousel" theme="gs_style1" img="gs_circle"]' ); ?>
+`
+
 Confused? 
 
-*   [View live Demos &raquo;](http://testimonial.gsamdani.com)
-*	[Visual Installation & Usage Guide &raquo;](http://testimonial.gsamdani.com/documentation)
+* [View live Demos &raquo;](http://testimonial.gsamdani.com)
+* [Visual Installation & Usage Guide &raquo;](http://testimonial.gsamdani.com/documentation)
 
 Normally Testimonials will show by descending order, latest will show first. But if you wish to display ascending order, oldest at first then pass order="ASC" parameter to shortcode like 
+`
 [gs_testimonial order="ASC"]
-
+`
 
 == Installation ==
 
@@ -160,24 +206,38 @@ Testimonial post type will show below POSTS. To add new testimonial, go to Testi
 Better to add square size image. Default image size set to 86px X 86px.
 
 = How to use shortcode inside page templates? =
-WordPress has a great function, do_shortcode(), that will allow you to use shortcodes inside your theme files. For example, to output Testimonials in a Theme file, you would do this: ```<?php echo do_shortcode('[gs_testimonial]'); ?>```
+WordPress has a great function, do_shortcode(), that will allow you to use shortcodes inside your theme files. For example, to output Testimonials in a Theme file, you would do this: 
+`
+<?php echo do_shortcode('[gs_testimonial]'); ?>
+`
 
 == Screenshots ==
 1. GS Testimonial Slider output on pages/post after adding shortcode [gs_testimonial] - Testimonial Frontend Presentation - 1
-2. Testimonial Frontend Presentation - 2
-3. Testimonial Frontend Presentation - 3
-4. Testimonial Frontend Presentation - 4
-5. Testimonial Frontend Presentation - 5
-6. Testimonial Frontend Presentation - 6
-7. Testimonial Frontend Presentation - 7
-8. Testimonial Frontend Presentation - 8
-9. Testimonials > Add New. Then add Author Name, Testimonial, Author Image, Company Name, Designation
-10. Testimonials > All Testimonials. View all Testimonials at a glance.
-11. Testimonial Settings -> General Settings (Available only at PRO version)
-12. Testimonial Settings -> Style Settings (Available only at PRO version)
-13. Testimonial Settings -> Advance Settings (Available only at PRO version)
+2. GS Testimonials Column Slider View
+3. GS Testimonial With Full Screen Slider View
+4. GS Testimonial With Flip Slider View
+5. GS Testimonial With Filter View
+6. GS Testimonial With Masonry View - 1
+7. GS Testimonial With Masonry View - 2
+8. GS Testimonial With Masonry View - 3
+9. GS Testimonial With Masonry View - 4
+10. GS Testimonial With Masonry View - 5
+11. GS Testimonial Widget
+12. GS Testimonial Frontend Submission Form
+13. Testimonials > Add New. Then add Author Name, Testimonial, Author Image, Company Name, Designation, Star Rating
+14. Testimonials > All Testimonials. View all Testimonials at a glance.
+15. Testimonial Settings -> General Settings (Available only at PRO version)
+16. Testimonial Settings -> Style Settings (Available only at PRO version)
+17. Testimonial Settings -> Advance Settings (Available only at PRO version)
 
 == Changelog ==
+= version 1.7 =
+* Fixed function name conflict with Team plugin.
+
+= version 1.6 =
+* Help & Usage Link added
+* Installation Video Added
+
 = version 1.0.5 =
 * Fixed query issue for WP 4.4
 
@@ -202,6 +262,13 @@ WordPress has a great function, do_shortcode(), that will allow you to use short
 * Initial release
 
 == Upgrade notice ==
+= version 1.7 =
+* Fixed function name conflict with Team plugin.
+
+= version 1.6 =
+* Help & Usage Link added
+* Installation Video Added
+
 = version 1.0.5 =
 * Fixed query issue for WP 4.4
 

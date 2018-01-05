@@ -11,7 +11,7 @@ if ( ! class_exists( 'TSSPro' ) ) {
 		function __construct() {
 			$this->options        = array(
 				'settings'          => 'tss_settings',
-				'version'           => 1.2,
+				'version'           => TSS_VERSION,
 				'installed_version' => 'tss_installed_version',
 				'flash'             => 'tss_flash'
 			);

@@ -4,7 +4,7 @@ Donate link:
 Tags: testimonials slider, testimonial, testimonials,testimonial slide, testimonial showcase, responsive testimonial, testimonial plugin
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 1.2
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Best Responsive Testimonial Slider and Showcase. It is a fully Responsive & mobi
 
 == Description ==
 
-[Plugin Demo](http://demo.radiustheme.com/wordpress/plugins/testimonials-slider/) | [Documentation](https://www.radiustheme.com/setup-wp-testimonials-slider-showcase-wordpress/) | [Get Pro Version](https://www.radiustheme.com/setup-wp-testimonials-slider-showcase-wordpress/)
+[Plugin Demo](http://demo.radiustheme.com/wordpress/plugins/testimonials-slider/) | [Documentation](https://www.radiustheme.com/setup-wp-testimonials-slider-showcase-wordpress/)
 
 Testimonial Slider is a fully Responsive & mobile friendly WordPress plugin to manage your client Testimonials.It had Slider & Grid layouts. You can create unlimited shortcode. It is fully flexible to use you can control how many display per row and primary colors from shortcode generator.
 
@@ -26,34 +26,6 @@ Testimonial Slider is a fully Responsive & mobile friendly WordPress plugin to m
 * Pagination supported
 * Custom query builder
 * Widget supported
-
-= Pro Features =
-* 30 Amazing Layouts with Grid, Slider, Isotope & Video.
-* Even and Masonry Grid for all Grid.
-* Generate Unlimited grid.
-* Layout Preview in Shortcode Settings.
-* Order by Name, Id, Date,  Random and Menu order.
-* Display image size (thumbnail, medium, large, full and Custom Image 
-* Custom Image Re-size option.
-* Isotope filter for categories
-* Search field on Isotope.
-* Set Default Isotope Filter Button.
-* Disable Show All Button for Isotope Filter.
-* All Fields Control.
-* All Text color, size and Button Color control.
-* Overlay color and opacity control.
-* Default image set option in Shortcode generator settings.
-* Enable/Disable Pagination.
-* Ajax Pagination: Load more, Load on scroll
-* Author Social Icon on testimonial.
-* Desktop, Tab & Mobile Display Control.
-* Excerpt Limit .
-* Front End Submission
-* Front End fields control
-* Re-captcha on form.
-
-
-[Get Pro Version](https://www.radiustheme.com/setup-wp-testimonials-slider-showcase-wordpress/)
 
 For any bug or suggestion please mail us: support@radiustheme.com
 

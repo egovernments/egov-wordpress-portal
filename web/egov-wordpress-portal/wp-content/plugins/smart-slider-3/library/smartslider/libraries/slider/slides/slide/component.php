@@ -189,7 +189,7 @@ abstract class  N2SSSlideComponent {
 
     private function pluginCrop($html) {
 
-        $cropStyle = $this->data->get('crop');
+        $cropStyle = $this->data->get('crop', 'visible');
 
         if (self::$isAdmin) {
             if ($cropStyle == 'auto') {
@@ -217,7 +217,9 @@ abstract class  N2SSSlideComponent {
         $this->attributes['style'] .= 'overflow:' . $cropStyle . ';';
 
         if (self::$isAdmin) {
-            $this->attributes['data-crop'] = $this->data->get('crop');
+            $crop = $this->data->get('crop', 'visible');
+            if (empty($crop)) $crop = 'visible';
+            $this->attributes['data-crop'] = $crop;
         }
 
         return $html;
@@ -243,7 +245,7 @@ abstract class  N2SSSlideComponent {
                     $animations['out'][$i] = (object)$animations['out'][$i];
                 }
             }
-            $this->attributes['data-animations'] = base64_encode(json_encode($animations));
+            $this->attributes['data-animations'] = n2_base64_encode(json_encode($animations));
         }
 
         $this->pluginAnimationGetEventAttributes();
@@ -258,7 +260,7 @@ abstract class  N2SSSlideComponent {
             $click = $this->data->get('click');
             if (!empty($click)) {
                 $this->attributes['data-click'] = $this->pluginAnimationParseEventCode($click, $sliderId);
-                $this->attributes['style'] .= 'cursor:pointer;';
+                $this->attributes['style']      .= 'cursor:pointer;';
             }
             $mouseenter = $this->data->get('mouseenter');
             if (!empty($mouseenter)) {
@@ -364,10 +366,10 @@ abstract class  N2SSSlideComponent {
 
     protected function renderBackground() {
         $background = '';
-        $image      = $this->data->get('bgimage');
+        $image      = $this->slide->fill($this->data->get('bgimage'));
         if ($image != '') {
-            $x = intval($this->data->get('bgimagex', 50));
-            $y = intval($this->data->get('bgimagey', 50));
+            $x          = intval($this->data->get('bgimagex', 50));
+            $y          = intval($this->data->get('bgimagey', 50));
             $background .= 'URL("' . N2ImageHelper::fixed($image) . '") ' . $x . '% ' . $y . '% / cover no-repeat' . ($this->data->get('bgimageparallax', 0) ? ' fixed' : '');
         }
 
@@ -391,7 +393,7 @@ abstract class  N2SSSlideComponent {
                     return 'background:-moz-linear-gradient(45deg, ' . N2Color::colorToRGBA($color) . ' 0%,' . N2Color::colorToRGBA($colorend) . ' 100%)' . $after . ';' . 'background:-webkit-linear-gradient(45deg, ' . N2Color::colorToRGBA($color) . ' 0%,' . N2Color::colorToRGBA($colorend) . ' 100%)' . $after . ';' . 'background:linear-gradient(45deg, ' . N2Color::colorToRGBA($color) . ' 0%,' . N2Color::colorToRGBA($colorend) . ' 100%)' . $after . ';';
                     break;
                 case 'diagonal2':
-                    return 'background:-moz-linear-gradient(-45deg, ' . N2Color::colorToRGBA($color) . ' 0%,' . N2Color::colorToRGBA($colorend) . ' 100%)' . $after . ';' . 'background:-webkit-linear-gradient(-45deg, ' . N2Color::colorToRGBA($color) . ' 0%,' . N2Color::colorToRGBA($colorend) . ' 100%)' . $after . ';' . 'background:linear-gradient(-45deg, ' . N2Color::colorToRGBA($color) . ' 0%,' . N2Color::colorToRGBA($colorend) . ' 100%)' . $after . ';';
+                    return 'background:-moz-linear-gradient(-45deg, ' . N2Color::colorToRGBA($colorend) . ' 0%,' . N2Color::colorToRGBA($color) . ' 100%)' . $after . ';' . 'background:-webkit-linear-gradient(-45deg, ' . N2Color::colorToRGBA($colorend) . ' 0%,' . N2Color::colorToRGBA($color) . ' 100%)' . $after . ';' . 'background:linear-gradient(-45deg, ' . N2Color::colorToRGBA($colorend) . ' 0%,' . N2Color::colorToRGBA($color) . ' 100%)' . $after . ';';
                     break;
                 case 'off':
                 default:

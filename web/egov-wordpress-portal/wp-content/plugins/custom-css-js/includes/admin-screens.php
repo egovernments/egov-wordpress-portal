@@ -64,15 +64,17 @@ class CustomCSSandJS_Admin {
             'wp_loaded'                 => 'compatibility_shortcoder',
             'wp_ajax_ccj_active_code'   => 'wp_ajax_ccj_active_code',
             'post_submitbox_start'      => 'post_submitbox_start',
+            'restrict_manage_posts'     => 'restrict_manage_posts',
         );
         foreach( $actions as $_key => $_value ) {
             add_action( $_key, array( $this, $_value ) );
         }
 
-
         // Add some custom actions/filters
         add_action( 'manage_custom-css-js_posts_custom_column', array( $this, 'manage_posts_columns' ), 10, 2 );
+        add_filter( 'manage_edit-custom-css-js_sortable_columns', array( $this, 'manage_edit_posts_sortable_columns' ) );
         add_filter( 'post_row_actions', array( $this, 'post_row_actions' ), 10, 2 );
+        add_filter( 'parse_query', array($this, 'parse_query') , 10);
     }
 
 
@@ -113,40 +115,34 @@ class CustomCSSandJS_Admin {
         $cm = $a . '/codemirror';
         $v = CCJ_VERSION;
 
-        wp_register_script( 'ccj_admin', $a . '/ccj_admin.js', array('jquery', 'jquery-ui-resizable'), $v, false );
-        wp_localize_script( 'ccj_admin', 'CCJ', $this->cm_localize() );
-        wp_enqueue_script( 'ccj_admin' );
-        wp_enqueue_style( 'ccj_admin', $a . '/ccj_admin.css', array(), $v );
+        wp_register_script( 'ccj-admin', $a . '/ccj_admin.js', array('jquery', 'jquery-ui-resizable'), $v, false );
+        wp_localize_script( 'ccj-admin', 'CCJ', $this->cm_localize() );
+        wp_enqueue_script( 'ccj-admin' );
+        wp_enqueue_style( 'ccj-admin', $a . '/ccj_admin.css', array(), $v );
 
 
         // Only for the new/edit Code's page
         if ( $hook == 'post-new.php' || $hook == 'post.php' ) {
             wp_enqueue_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css', array(), $v );
-            /*
-            wp_enqueue_script( 'ccj_codemirror', $cm . '/codemirror-compressed.js', array( 'jquery' ), $v, false);
-            wp_enqueue_style( 'ccj_codemirror', $cm . '/codemirror-compressed.css', array(), $v );
-            */
-            wp_enqueue_script( 'ccj_codemirror', $cm . '/lib/codemirror.js', array( 'jquery' ), $v, false);
-            wp_enqueue_style( 'ccj_codemirror', $cm . '/lib/codemirror.css', array(), $v );
-            wp_enqueue_script( 'ccj_admin_url_rules', $a . '/ccj_admin-url_rules.js', array('jquery'), $v, false );
-            wp_enqueue_script( 'ccj_scrollbars', $cm . '/addon/scroll/simplescrollbars.js', array('ccj_codemirror'), $v, false );
-            wp_enqueue_style( 'ccj_scrollbars', $cm . '/addon/scroll/simplescrollbars.css', array(), $v );
+            wp_enqueue_script( 'ccj-codemirror', $cm . '/lib/codemirror.js', array( 'jquery' ), $v, false);
+            wp_enqueue_style( 'ccj-codemirror', $cm . '/lib/codemirror.css', array(), $v );
+            wp_enqueue_script( 'ccj-admin_url_rules', $a . '/ccj_admin-url_rules.js', array('jquery'), $v, false );
+            wp_enqueue_script( 'ccj-scrollbars', $cm . '/addon/scroll/simplescrollbars.js', array('ccj-codemirror'), $v, false );
+            wp_enqueue_style( 'ccj-scrollbars', $cm . '/addon/scroll/simplescrollbars.css', array(), $v );
 
             // Add the language modes
             $cmm = $cm . '/mode/';
-            wp_enqueue_script('cm-xml', $cmm . 'xml/xml.js',               array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-js', $cmm . 'javascript/javascript.js',  array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-css', $cmm . 'css/css.js',               array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-htmlmixed', $cmm . 'htmlmixed/htmlmixed.js', array('ccj_codemirror'), $v, false);
+            wp_enqueue_script('cm-xml', $cmm . 'xml/xml.js',               array('ccj-codemirror'), $v, false);
+            wp_enqueue_script('cm-js', $cmm . 'javascript/javascript.js',  array('ccj-codemirror'), $v, false);
+            wp_enqueue_script('cm-css', $cmm . 'css/css.js',               array('ccj-codemirror'), $v, false);
+            wp_enqueue_script('cm-htmlmixed', $cmm . 'htmlmixed/htmlmixed.js', array('ccj-codemirror'), $v, false);
 
             $cma = $cm . '/addon/';
-            wp_enqueue_script('cm-dialog', $cma . 'dialog/dialog.js', array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-search', $cma . 'search/search.js', array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-searchcursor', $cma . 'search/searchcursor.js',array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-jump-to-line', $cma . 'search/jump-to-line.js', array('ccj_codemirror'), $v, false);
-            wp_enqueue_script('cm-matchesonscrollbar', $cma . 'search/matchesonscrollbar.js', array('ccj_codemirror'), $v, false);
+            wp_enqueue_script('cm-dialog', $cma . 'dialog/dialog.js', array('ccj-codemirror'), $v, false);
+            wp_enqueue_script('cm-search', $cma . 'search/search.js', array('ccj-codemirror'), $v, false);
+            wp_enqueue_script('cm-searchcursor', $cma . 'search/searchcursor.js',array('ccj-codemirror'), $v, false);
+            wp_enqueue_script('cm-jump-to-line', $cma . 'search/jump-to-line.js', array('ccj-codemirror'), $v, false);
             wp_enqueue_style('cm-dialog', $cma . 'dialog/dialog.css', array(), $v );
-            wp_enqueue_style('cm-matchesonscrollbar', $cma . 'search/matchesonscrollbar.css', array(), $v );
 
             // remove the assets from other plugins so it doesn't interfere with CodeMirror
             global $wp_scripts;
@@ -335,6 +331,71 @@ class CustomCSSandJS_Admin {
         }
     }
 
+
+    /**
+     * Make the 'Modified' column sortable
+     */
+    function manage_edit_posts_sortable_columns( $columns ) {
+        $columns['modified'] = 'modified';
+        return $columns;
+        
+    }
+
+
+    /**
+     * List table: Change the query in order to filter by code type 
+     */
+    function parse_query( $query ){
+        if ( !is_admin() || !$query->is_main_query() ){ 
+          return $query;
+        }
+
+        if ( 'custom-css-js' !== $query->query['post_type'] ) { 
+          return $query;
+        }
+
+        $filter = filter_input( INPUT_GET, 'language_filter' );
+        if ( !is_string($filter) || strlen($filter) == 0 ) {
+            return $query;
+        }
+
+        global $wpdb;
+        $post_id_query = "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND meta_value LIKE %s";
+        $post_ids = $wpdb->get_col( $wpdb->prepare($post_id_query, 'options', '%'.$filter.'%') );
+        if ( !is_array($post_ids) || count($post_ids) == 0 ) {
+            $post_ids = array(-1);
+        }
+        $query->query_vars['post__in'] = $post_ids; 
+
+        return $query;
+    }
+
+
+    /**
+     * List table: add a filter by code type 
+     */
+    function restrict_manage_posts( $post_type ) {
+        if('custom-css-js' !== $post_type){
+            return; 
+        }
+
+        $languages = array(
+            'css'       => __('CSS Codes', 'custom-cs-js'),
+            'js'        => __('JS Codes', 'custom-css-js'),
+            'html'      => __('HTML Codes', 'custom-css-js'),
+        );
+
+		echo '<label class="screen-reader-text" for="custom-css-js-filter">' . esc_html__( 'Filter Code Type', 'custom-css-js' ) . '</label>';
+		echo '<select name="language_filter" id="custom-css-js-filter">';
+        echo '<option  value="">' . __('All Custom Codes', 'custom-css-js'). '</option>';
+		foreach ( $languages as $_lang => $_label ) {
+			$selected = selected( filter_input( INPUT_GET, 'language_filter' ), $_lang, false ); ;
+            echo '<option ' . $selected . ' value="' . $_lang. '">' . $_label . '</option>';
+		}
+		echo '</select>';
+    }
+
+
     /**
      * Activate/deactivate a code
      *
@@ -515,6 +576,24 @@ class CustomCSSandJS_Admin {
         }
         $language = $this->get_language($post_id);
 
+        // Replace the htmlentities (https://wordpress.org/support/topic/annoying-bug-in-text-editor/), but only selectively
+        if ( strstr($post->post_content, '&') ) {
+
+            // First the ampresands
+            $post->post_content = str_replace('&amp', htmlentities('&amp'), $post->post_content );
+
+            // Then the rest of the entities
+            $entities = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES | ENT_HTML5 );
+            unset( $entities[ array_search('&amp;', $entities) ]);
+            $regular_expression = str_replace(';', '', '/('.implode('|', $entities).')/i');
+            preg_match_all($regular_expression, $post->post_content, $matches);
+            if ( isset($matches[0]) && count($matches[0]) > 0 ) {
+                foreach($matches[0] as $_entity) {
+                    $post->post_content = str_replace($_entity, htmlentities($_entity), $post->post_content);
+                }
+            }
+        }
+
         switch ( $language ) {
             case 'js' :
                 if ( $new_post ) {
@@ -590,6 +669,23 @@ End of comment */ ', 'custom-css-js') . PHP_EOL . PHP_EOL;
                 <div class="code-mirror-before"><div><?php echo htmlentities( $code_mirror_before );?></div></div>
                 <textarea class="wp-editor-area" id="content" mode="<?php echo htmlentities($code_mirror_mode); ?>" name="content"><?php echo $post->post_content; ?></textarea>
                 <div class="code-mirror-after"><div><?php echo htmlentities( $code_mirror_after );?></div></div>
+
+                <table id="post-status-info"><tbody><tr>
+                    <td class="autosave-info">
+                    <span class="autosave-message">&nbsp;</span>
+                <?php
+                    if ( 'auto-draft' != $post->post_status ) {
+                        echo '<span id="last-edit">';
+                    if ( $last_user = get_userdata( get_post_meta( $post->ID, '_edit_last', true ) ) ) {
+                        printf(__('Last edited by %1$s on %2$s at %3$s', 'custom-css-js-pro'), esc_html( $last_user->display_name ), mysql2date(get_option('date_format'), $post->post_modified), mysql2date(get_option('time_format'), $post->post_modified));
+                    } else {
+                        printf(__('Last edited on %1$s at %2$s', 'custom-css-js-pro'), mysql2date(get_option('date_format'),      $post->post_modified), mysql2date(get_option('time_format'), $post->post_modified));
+                    }
+                    echo '</span>';
+                } ?>
+                    </td>
+                </tr></tbody></table>
+
 
                 <input type="hidden" id="update-post_<?php echo $post->ID ?>" value="<?php echo wp_create_nonce('update-post_'. $post->ID ); ?>" />
               </form>
@@ -911,6 +1007,12 @@ End of comment */ ', 'custom-css-js') . PHP_EOL . PHP_EOL;
             return;
         }
 
+        if ( $options['language'] == 'js' ) {
+            if ( preg_match('@/\* Add your JavaScript code here[\s\S]*?End of comment \*/@im', $_POST['content'] ) ) {
+                $_POST['content'] = preg_replace('@/\* Add your JavaScript code here[\s\S]*?End of comment \*/@im', '/* Default comment here */', $_POST['content']);
+            }
+        }
+
 
         // Save the Custom Code in a file in `wp-content/uploads/custom-css-js`
         if ( $options['linking'] == 'internal' ) {
@@ -923,8 +1025,11 @@ End of comment */ ', 'custom-css-js') . PHP_EOL . PHP_EOL;
             }
             if ( $options['language'] == 'js' ) {
                 if ( ! preg_match( '/<script\b[^>]*>([\s\S]*?)<\/script>/im', $_POST['content'] ) ) {
-                $before .= '<script type="text/javascript">' . PHP_EOL;
-                $after = '</script>' . PHP_EOL . $after;
+                    $before .= '<script type="text/javascript">' . PHP_EOL;
+                    $after = '</script>' . PHP_EOL . $after;
+                } else {
+                    // the content has a <script> tag, then remove the comments so they don't show up on the frontend
+                    $_POST['content'] = preg_replace('@/\*[\s\S]*?\*/@', '', $_POST['content']);
                 }
             }
         }

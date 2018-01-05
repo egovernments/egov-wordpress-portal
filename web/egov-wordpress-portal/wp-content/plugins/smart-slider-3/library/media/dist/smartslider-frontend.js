@@ -171,7 +171,7 @@ N2Require('SmartSliderLoad', [], [], function ($, scope, undefined) {
         this.$window = $(window);
 
         this.spinner = $('#' + this.id + '-spinner');
-    };
+    }
 
 
     SmartSliderLoad.prototype.start = function () {
@@ -197,9 +197,7 @@ N2Require('SmartSliderLoad', [], [], function ($, scope, undefined) {
             this.showSlider();
 
         } else {
-            this.smartSlider.responsive.ready.done($.proxy(function () {
-                this._showSlider();
-            }, this));
+            this.showSlider();
         }
     };
 
@@ -282,6 +280,65 @@ N2Require('SmartSliderLoad', [], [], function ($, scope, undefined) {
 
     return SmartSliderLoad;
 });
+N2Require('scrollTracker', [], [], function ($, scope, undefined) {
+    function scrollTracker() {
+        this.started = false;
+        this.items = [];
+    }
+
+    scrollTracker.prototype.add = function ($el, onVisible, onHide) {
+        var item = {
+            $el: $el,
+            onVisible: onVisible,
+            onHide: onHide,
+            state: 'unknown'
+        };
+        this.items.push(item);
+        this._onScroll(item, Math.max(document.documentElement.clientHeight, window.innerHeight));
+
+        if (!this.started) {
+            this.start();
+        }
+    };
+
+    scrollTracker.prototype.start = function () {
+        if (!this.started) {
+            $(window).on('scroll.scrollTracker', $.proxy(this.onScroll, this));
+            this.started = true;
+        }
+    };
+
+    scrollTracker.prototype.onScroll = function (e) {
+        var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+
+        for (var i = 0; i < this.items.length; i++) {
+            this._onScroll(this.items[i], viewHeight);
+        }
+    };
+
+    scrollTracker.prototype._onScroll = function (item, viewHeight) {
+        var rect = item.$el[0].getBoundingClientRect();
+        var isBigPlayer = rect.height > viewHeight * 0.7;
+        if ((!isBigPlayer && (rect.bottom - rect.height < 0 || rect.top - viewHeight + rect.height >= 0)) || (isBigPlayer && (rect.bottom < 0 || rect.top >= rect.height))) {
+            if (item.state != 'hidden') {
+                if (typeof item.onHide == 'function') {
+                    item.onHide();
+                }
+                item.state = 'hidden';
+            }
+        } else {
+            if (item.state != 'visible') {
+                if (typeof item.onVisible == 'function') {
+                    item.onVisible();
+                }
+                item.state = 'visible';
+            }
+        }
+
+    };
+
+    nextend.scrollTracker = new scrollTracker();
+});
 N2Require('SmartSliderApi', [], [], function ($, scope, undefined) {
     function SmartSliderApi() {
         this.sliders = {};
@@ -339,6 +396,10 @@ N2Require('SmartSliderApi', [], [], function ($, scope, undefined) {
         ss[action].apply(ss, Array.prototype.slice.call(arguments, 2));
     };
 
+    SmartSliderApi.prototype.applyActionWithClick = function () {
+        if (!nextend.shouldPreventClick) this.applyAction.apply(this, arguments);
+    };
+
     window.n2ss = new SmartSliderApi();
 
     return SmartSliderApi;
@@ -358,6 +419,8 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
         if (window[id] && window[id] instanceof SmartSliderAbstract) {
             return false;
         }
+
+        this.isAdmin = !!parameters.admin;
 
         this.id = parseInt(id.replace('n2-ss-', ''));
 
@@ -434,7 +497,6 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
 
     SmartSliderAbstract.prototype.onSliderHasDimension = function ($sliderElement, parameters) {
         this.killed = false;
-        this.isAdmin = false;
 
         this.responsive = false;
         this.mainAnimationLastChangeTime = 0;
@@ -454,6 +516,7 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
             admin: false,
             playWhenVisible: 1,
             playWhenVisibleAt: 0.5,
+            perspective: 1000,
             callbacks: '',
             autoplay: {},
             blockrightclick: false,
@@ -504,6 +567,20 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
             particlejs: 0
         }, parameters);
 
+
+        if (!this.isAdmin) {
+            if (!parameters.responsive.desktop || !parameters.responsive.tablet || !parameters.responsive.mobile) {
+                var md = new MobileDetect(window.navigator.userAgent, 801),
+                    isTablet = !!md.tablet(),
+                    isMobile = !!md.phone();
+
+                if (!parameters.responsive.mobile && isMobile || !parameters.responsive.tablet && isTablet || !parameters.responsive.desktop && !isTablet && !isMobile) {
+                    this.kill();
+                    return;
+                }
+            }
+        }
+
         this.firstSlideReady = $.Deferred();
 
         try {
@@ -519,11 +596,11 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
         this.widgetDeferreds = [];
         this.sliderElement.on('addWidget', $.proxy(this.addWidget, this));
 
-        this.isAdmin = !!this.parameters.admin;
         if (this.isAdmin) {
             this.changeTo = function () {
             };
         }
+
 
         this.load = new scope.SmartSliderLoad(this, this.parameters.load);
 
@@ -610,11 +687,13 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
             universalenter: $.proxy(function (e) {
                 if (!$(e.target).closest('.n2-full-screen-widget').length) {
                     this.sliderElement.addClass('n2-hover');
+                    this.widgets.setState('hover', true);
                 }
             }, this),
             universalleave: $.proxy(function (e) {
                 e.stopPropagation();
                 this.sliderElement.removeClass('n2-hover');
+                this.widgets.setState('hover', false);
             }, this)
         });
 
@@ -649,7 +728,7 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
 
         if (!this.isAdmin) {
             var event = 'click';
-            if (this.parameters.controls.touch != '0' && this.parameters.controls.touch) {
+            if (this.hasTouch()) {
                 event = 'n2click';
             }
             this.sliderElement.find('[data-n2click]').each(function (i, el) {
@@ -720,7 +799,7 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
             this.sliderElement.find('a').on({
                 focus: $.proxy(function (e) {
                     if (n2FocusAllowed) {
-                        var slide = this.slider.findSlideByElement(e.currentTarget);
+                        var slide = this.findSlideByElement(e.currentTarget);
                         if (slide && slide != this.currentRealSlide) {
                             this.directionalChangeToReal(slide.index);
                         }
@@ -951,30 +1030,22 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
             return false;
         };
 
-        var slidesCount = this.slides.length,
-            previousArrowOpacity = 1,
-            previousArrow = this.sliderElement.find('.nextend-arrow-previous'),
-            changePreviousArrowOpacity = function (opacity) {
-                if (opacity != previousArrowOpacity) {
-                    NextendTween.to(previousArrow, 0.4, {opacity: opacity}).play();
-                    previousArrowOpacity = opacity;
-                }
-            };
-        var nextArrowOpacity = 1,
-            nextArrow = this.sliderElement.find('.nextend-arrow-next'),
-            changeNextArrowOpacity = function (opacity) {
-                if (opacity != nextArrowOpacity) {
-                    NextendTween.to(nextArrow, 0.4, {opacity: opacity}).play();
-                    nextArrowOpacity = opacity;
-                }
-            };
+        var hideOrShowArrows = $.proxy(function (i) {
+            if (i == 0) {
+                this.widgets.setState('nonCarouselFirst', true);
+            } else {
+                this.widgets.setState('nonCarouselFirst', false);
+            }
+            if (i == this.slides.length - 1) {
+                this.widgets.setState('nonCarouselLast', true);
+            } else {
+                this.widgets.setState('nonCarouselLast', false);
+            }
+        }, this);
 
-        var hideOrShowArrows = function (i) {
-            changePreviousArrowOpacity(i == 0 ? 0 : 1);
-            changeNextArrowOpacity(i == slidesCount - 1 ? 0 : 1);
-        };
-
-        hideOrShowArrows(this.currentSlide.index);
+        this.startedDeferred.done($.proxy(function () {
+            hideOrShowArrows(this.currentSlide.index);
+        }, this));
 
         this.sliderElement.on('sliderSwitchTo', function (e, i) {
             hideOrShowArrows(i);
@@ -1133,10 +1204,14 @@ N2Require('SmartSliderAbstract', [], [], function ($, scope, undefined) {
         this.dimensions = this.responsive.responsiveDimensions;
     };
 
+    SmartSliderAbstract.prototype.hasTouch = function () {
+        return this.parameters.controls.touch != '0' && this.slides.length > 1;
+    };
+
     SmartSliderAbstract.prototype.initControls = function () {
 
         if (!this.parameters.admin) {
-            if (this.parameters.controls.touch != '0' && this.slides.length > 1) {
+            if (this.hasTouch()) {
                 new scope.SmartSliderControlTouch(this, this.parameters.controls.touch, {
                     fallbackToMouseEvents: this.parameters.controls.drag
                 });
@@ -1237,8 +1312,54 @@ N2Require('SmartSliderWidgets', [], [], function ($, scope, undefined) {
         this.slider = slider;
         this.sliderElement = slider.sliderElement.on('BeforeVisible', $.proxy(this.onReady, this));
 
-        this.initExcludeSlides();
+        this.widgets = {};
+        this.excludedSlides = {};
+        this.states = {
+            hover: false,
+            nonCarouselFirst: false,
+            nonCarouselLast: false,
+            currentSlideIndex: -1
+        };
     }
+
+    SmartSliderWidgets.prototype.setState = function (name, value) {
+        if (this.states[name] != value) {
+            this.states[name] = value;
+            this.onStateChange();
+        }
+    };
+
+    SmartSliderWidgets.prototype.onStateChange = function () {
+        var widgetState = {};
+
+        for (var k in this.widgets) {
+            if (this.widgets[k].hasClass('n2-ss-widget-display-hover')) {
+                if (this.states.hover) {
+                    widgetState[k] = true;
+                } else {
+                    widgetState[k] = false;
+                }
+            } else {
+                widgetState[k] = true;
+            }
+            if (this.excludedSlides[k] != undefined) {
+                if ($.inArray(this.states.currentSlideIndex + 1, this.excludedSlides[k]) != -1) {
+                    widgetState[k] = false;
+                }
+            }
+        }
+
+        if (this.states.nonCarouselFirst) {
+            widgetState.previous = false;
+        }
+        if (this.states.nonCarouselLast) {
+            widgetState.next = false;
+        }
+
+        for (var k in this.widgets) {
+            this.widgets[k].toggleClass('n2-ss-widget-hidden', !widgetState[k]);
+        }
+    };
 
     SmartSliderWidgets.prototype.onReady = function () {
         this.dimensions = this.slider.dimensions;
@@ -1246,7 +1367,7 @@ N2Require('SmartSliderWidgets', [], [], function ($, scope, undefined) {
         this.widgets = {
             previous: this.sliderElement.find('.nextend-arrow-previous'),
             next: this.sliderElement.find('.nextend-arrow-next'),
-            bullet: this.sliderElement.find('.nextend-bullet-bar'),
+            bullet: this.sliderElement.find('.n2-ss-control-bullet'),
             autoplay: this.sliderElement.find('.nextend-autoplay'),
             indicator: this.sliderElement.find('.nextend-indicator'),
             bar: this.sliderElement.find('.nextend-bar'),
@@ -1255,6 +1376,43 @@ N2Require('SmartSliderWidgets', [], [], function ($, scope, undefined) {
             fullscreen: this.sliderElement.find('.nextend-fullscreen'),
             html: this.sliderElement.find('.nextend-widget-html')
         };
+
+        this.$vertical = this.sliderElement.find('[data-position="above"],[data-position="below"]').not('.nextend-shadow');
+
+        var hasExcluded = false
+        for (var k in this.widgets) {
+            var exclude = this.widgets[k].attr('data-exclude-slides');
+            if (exclude != undefined) {
+                var excludedSlides = exclude.split(',');
+                for (var i = excludedSlides.length - 1; i >= 0; i--) {
+                    var parts = excludedSlides[i].split('-');
+                    if (parts.length == 2) {
+                        var start = parseInt(parts[0]),
+                            end = parseInt(parts[1]);
+                        if (start <= end) {
+                            for (var j = start; j <= end; j++) {
+                                excludedSlides.push(j);
+                            }
+                        }
+                    } else {
+                        excludedSlides[i] = parseInt(excludedSlides[i]);
+                    }
+                }
+                if (excludedSlides.length > 0) {
+                    this.excludedSlides[k] = excludedSlides;
+                    hasExcluded = true;
+                }
+            }
+        }
+        if (hasExcluded) {
+
+            var refreshSlideIndex = $.proxy(function (e, targetSlideIndex) {
+                this.setState('currentSlideIndex', targetSlideIndex);
+            }, this);
+
+            refreshSlideIndex(null, this.slider.currentRealSlide.index);
+            this.slider.sliderElement.on('sliderSwitchTo', refreshSlideIndex);
+        }
 
         this.variableElementsDimension = {
             width: this.sliderElement.find('[data-sswidth]'),
@@ -1274,66 +1432,11 @@ N2Require('SmartSliderWidgets', [], [], function ($, scope, undefined) {
             this.onResize(this.slider.responsive.lastRatios);
         }, this));
 
-        //this.slider.ready($.proxy(function () {
         this.onResize(this.slider.responsive.lastRatios);
-        //}, this));
-        this.initHover();
+
+        this.onStateChange();
     };
 
-    SmartSliderWidgets.prototype.initHover = function () {
-        var timeout = null,
-            widgets = this.sliderElement.find('.n2-ss-widget-hover');
-        if (widgets.length > 0) {
-            this.sliderElement.on('universalenter', function (e) {
-                var slider = $(this);
-                if (timeout) clearTimeout(timeout);
-                widgets.css('visibility', 'visible');
-                setTimeout(function () {
-                    slider.addClass('n2-ss-widget-hover-show');
-                }, 50);
-            }).on('universalleave', function () {
-                var slide = this;
-                if (timeout) clearTimeout(timeout);
-                timeout = setTimeout(function () {
-                    $(slide).removeClass('n2-ss-widget-hover-show');
-                    timeout = setTimeout(function () {
-                        widgets.css('visibility', 'hidden');
-                    }, 400);
-                }, 500);
-            });
-        }
-    };
-
-    SmartSliderWidgets.prototype.initExcludeSlides = function () {
-        var widgets = this.sliderElement.find('.n2-ss-widget[data-exclude-slides]'),
-            hideOrShow = function (widget, excludedSlides, currentSlideIndex) {
-                if ($.inArray((currentSlideIndex + 1) + '', excludedSlides) != -1) {
-                    widget.addClass('n2-ss-widget-hidden');
-                } else {
-                    widget.removeClass('n2-ss-widget-hidden');
-                }
-            };
-        widgets.each($.proxy(function (i, el) {
-            var widget = $(el),
-                excludedSlides = widget.attr('data-exclude-slides').split(',');
-            for (var i = excludedSlides.length - 1; i >= 0; i--) {
-                var parts = excludedSlides[i].split('-');
-                if (parts.length == 2 && parseInt(parts[0]) <= parseInt(parts[1])) {
-                    excludedSlides[i] = parts[0];
-                    parts[0] = parseInt(parts[0]);
-                    parts[1] = parseInt(parts[1]);
-                    for (var j = parts[0] + 1; j <= parts[1]; j++) {
-                        excludedSlides.push(j + '');
-                    }
-                }
-            }
-            hideOrShow(widget, excludedSlides, this.slider.currentRealSlide.index);
-            this.slider.sliderElement
-                .on('sliderSwitchTo', function (e, targetSlideIndex) {
-                    hideOrShow(widget, excludedSlides, targetSlideIndex);
-                });
-        }, this));
-    };
 
     SmartSliderWidgets.prototype.onAnimatedResize = function (e, ratios, timeline, duration) {
         for (var key in this.widgets) {
@@ -1554,6 +1657,7 @@ N2Require('SmartSliderBackgroundAnimationAbstract', [], [], function ($, scope, 
             top: 0,
             left: 0
         });
+        NextendTween.set(this.clonedImages.nextImage, {transform: 'none'});
 
         this.containerElement.append(this.clonedImages.nextImage);
     };
@@ -1564,6 +1668,7 @@ N2Require('SmartSliderBackgroundAnimationAbstract', [], [], function ($, scope, 
             top: 0,
             left: 0
         });
+        NextendTween.set(this.clonedImages.currentImage, {transform: 'none'});
 
         this.containerElement.append(this.clonedImages.currentImage);
     };
@@ -2517,6 +2622,7 @@ N2Require('SmartSliderBackgroundAnimationFluxAbstract', ['SmartSliderBackgroundA
                     height: this.h
                 });
             this._clonedCurrent.find('.n2-ss-slide-background-video').remove();
+            NextendTween.set(this._clonedCurrent, {transform: 'none'});
         }
         return this._clonedCurrent;
     };
@@ -2530,6 +2636,7 @@ N2Require('SmartSliderBackgroundAnimationFluxAbstract', ['SmartSliderBackgroundA
                     height: this.h
                 });
             this._clonedNext.find('.n2-ss-slide-background-video').remove();
+            NextendTween.set(this._clonedNext, {transform: 'none'});
         }
         return this._clonedNext;
     };
@@ -4947,7 +5054,7 @@ N2Require('FrontendComponentRow', ['FrontendComponent'], [], function ($, scope,
         if (this.children.length > 0) {
             for (var i = this.children.length - 1; i >= 0; i--) {
                 this.children[i].$layer
-                    .css('marginRight', gutterValue)
+                    .css(nextend.rtl.marginRight, gutterValue)
                     .css('marginTop', gutterValue);
             }
         }
@@ -5059,6 +5166,7 @@ N2Require('SmartSliderResponsive', [], [], function ($, scope, undefined) {
             maximumSlideWidthMobileLandscape: 0,
             maximumSlideWidthConstrainHeight: 0,
             forceFull: 0,
+            forceFullOverflowX: 'body',
             forceFullHorizontalSelector: '',
             verticalOffsetSelectors: '',
 
@@ -5164,7 +5272,6 @@ N2Require('SmartSliderResponsive', [], [], function ($, scope, undefined) {
     };
 
     SmartSliderResponsive.prototype.start = function () {
-
         if (nextend.fontsDeferred == undefined) {
             nextend.loadDeferred.always($.proxy(function () {
                 this.loadDeferred.resolve();
@@ -5240,19 +5347,6 @@ N2Require('SmartSliderResponsive', [], [], function ($, scope, undefined) {
                 }
         }
 
-        if (!this.slider.isAdmin) {
-            if (!this.parameters.desktop || !this.parameters.tablet || !this.parameters.mobile) {
-                if (isTablet == null) {
-                    var md = new MobileDetect(window.navigator.userAgent, 801);
-                    isTablet = !!md.tablet();
-                    isMobile = !!md.phone();
-                }
-                if (!this.parameters.mobile && isMobile || !this.parameters.tablet && isTablet || !this.parameters.desktop && !isTablet && !isMobile) {
-                    this.slider.kill();
-                    return;
-                }
-            }
-        }
         this.verticalOffsetSelectors = $(this.parameters.verticalOffsetSelectors);
 
         n2c.log('Responsive: Store defaults');
@@ -5562,7 +5656,9 @@ N2Require('SmartSliderResponsive', [], [], function ($, scope, undefined) {
 
         if (!this.slider.isAdmin) {
             if (this.parameters.forceFull) {
-                $('body').css('overflow-x', 'hidden');
+                if (this.parameters.forceFullOverflowX != 'none') {
+                    $(this.parameters.forceFullOverflowX).css('overflow-x', 'hidden');
+                }
                 var customWidth = 0,
                     adjustLeftOffset = 0;
 
@@ -5968,6 +6064,13 @@ N2Require('SmartSliderResponsive', [], [], function ($, scope, undefined) {
         for (var i = 0; i < this.verticalOffsetSelectors.length; i++) {
             h += this.verticalOffsetSelectors.eq(i).outerHeight();
         }
+
+        if (this.slider.widgets.$vertical) {
+            for (var i = 0; i < this.slider.widgets.$vertical.length; i++) {
+                h += this.slider.widgets.$vertical.eq(i).outerHeight();
+            }
+        }
+
         return h;
     };
 
@@ -6251,6 +6354,22 @@ N2Require('SmartSliderResponsiveElement', [], [], function ($, scope, undefined)
         return value + 'px';
     };
 
+    SmartSliderResponsiveElement.prototype.borderLeftWidthPrepare = function (value) {
+        return parseInt(value);
+    };
+
+    SmartSliderResponsiveElement.prototype.borderRightWidthPrepare = function (value) {
+        return parseInt(value);
+    };
+
+    SmartSliderResponsiveElement.prototype.borderTopWidthPrepare = function (value) {
+        return parseInt(value);
+    };
+
+    SmartSliderResponsiveElement.prototype.borderBottomWidthPrepare = function (value) {
+        return parseInt(value);
+    };
+
     SmartSliderResponsiveElement.prototype.fontSizePrepare = function (value) {
         var mode = this.responsive.getNormalizedModeString();
         if (value < this.helper.fontSize[mode]) {
@@ -6288,6 +6407,12 @@ N2Require('SmartSliderResponsiveElement', [], [], function ($, scope, undefined)
 N2Require('FrontendItemVimeo', [], [], function ($, scope, undefined) {
 
     function FrontendItemVimeo(slider, id, sliderid, parameters, hasImage, start) {
+        this.state = {
+            scroll: false,
+            slide: true,
+            play: false,
+            continuePlay: false
+        };
         this.readyDeferred = $.Deferred();
 
         this.slider = slider;
@@ -6326,7 +6451,7 @@ N2Require('FrontendItemVimeo', [], [], function ($, scope, undefined) {
                 }, this));
             }, this));
         }
-    };
+    }
 
     FrontendItemVimeo.vimeoDeferred = null;
 
@@ -6374,13 +6499,20 @@ N2Require('FrontendItemVimeo', [], [], function ($, scope, undefined) {
 
         this.player.on('pause', $.proxy(function () {
             layer.triggerHandler('n2pause');
-        }));
+            if (this.state.continuePlay) {
+                this.state.continuePlay = false;
+                this.state.play = true;
+            } else {
+                this.state.play = false;
+            }
+        }, this));
 
         this.player.on('ended', $.proxy(function () {
             if (!this.isStatic) {
                 this.slider.sliderElement.trigger('mediaEnded', this.playerId);
             }
             layer.triggerHandler('n2stop');
+            this.state.play = false;
         }, this));
 
         if (!this.isStatic) {
@@ -6389,16 +6521,26 @@ N2Require('FrontendItemVimeo', [], [], function ($, scope, undefined) {
                 if ($.inArray(this.slide, this.slider.getVisibleSlides(this.slider.slides[currentSlideIndex])) == -1) {
                     if (parseInt(this.parameters.reset)) {
                         this.reset();
-                    } else {
-                        this.pause();
                     }
+                    this.setState('slide', false);
+                } else {
+                    this.setState('slide', true);
                 }
+            }, this));
+
+            nextend.scrollTracker.add(this.playerElement, $.proxy(function () {
+                this.setState('scroll', true);
+            }, this), $.proxy(function () {
+                this.state.continuePlay = true;
+                this.setState('scroll', false);
             }, this));
         }
 
         if (this.parameters.autoplay == 1) {
             this.slider.visible($.proxy(this.initAutoplay, this));
         }
+
+        this.playerElement.parent().css('background', '');
         this.readyDeferred.resolve();
     };
 
@@ -6430,15 +6572,30 @@ N2Require('FrontendItemVimeo', [], [], function ($, scope, undefined) {
             //change slide
             this.slider.sliderElement.on("mainAnimationComplete", $.proxy(function (e, mainAnimation, previousSlideIndex, currentSlideIndex, isSystem) {
                 if ($.inArray(this.slide, this.slider.getVisibleSlides(this.slider.slides[currentSlideIndex])) >= 0) {
-                    this.play();
+                    this.state.play = true;
+                    this.setState('slide', true);
+                } else {
+                    this.setState('slide', false);
                 }
             }, this));
 
             if ($.inArray(this.slide, this.slider.getVisibleSlides()) >= 0) {
-                this.play();
+                this.state.play = true;
+                this.setState('slide', true);
             }
         } else {
+            this.state.play = true;
+            this.setState('slide', true);
+        }
+    };
+
+    FrontendItemVimeo.prototype.setState = function (name, value) {
+        this.state[name] = value;
+
+        if (this.state.play && this.state.slide && this.state.scroll) {
             this.play();
+        } else {
+            this.pause();
         }
     };
 
@@ -6476,6 +6633,12 @@ N2Require('FrontendItemVimeo', [], [], function ($, scope, undefined) {
 N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
 
     function FrontendItemYouTube(slider, id, parameters, hasImage) {
+        this.state = {
+            scroll: false,
+            slide: true,
+            play: false,
+            continuePlay: false
+        };
         this.readyDeferred = $.Deferred();
         this.slider = slider;
         this.playerId = id;
@@ -6493,11 +6656,20 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
             showinfo: 1,
             modestbranding: 1,
             reset: 0,
-            query: []
+            query: [],
+            playsinline: 0
         }, parameters);
 
-        if (navigator.userAgent.toLowerCase().indexOf("android") > -1 || n2const.isIOS) {
+        if (this.parameters.autoplay == 1 && (navigator.userAgent.toLowerCase().indexOf("android") > -1 || n2const.isIOS)) {
             this.parameters.autoplay = 0;
+            try {
+                if ('playsInline' in document.createElement('video')) {
+                    this.parameters.autoplay = 1;
+                    this.parameters.playsinline = 1;
+                    this.parameters.volume = 0;
+                }
+            } catch (e) {
+            }
         }
 
         if (this.parameters.autoplay == 1 || !hasImage || n2const.isMobile) {
@@ -6564,8 +6736,9 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
             rel: this.parameters.related,
             vq: this.parameters.vq,
             start: this.parameters.start,
-            showinfo: this.parameters.start.showinfo,
-            modestbranding: this.parameters.start.modestbranding
+            showinfo: this.parameters.showinfo,
+            modestbranding: this.parameters.modestbranding,
+            playsinline: this.parameters.playsinline
         };
 
         if (this.parameters.center == 1) {
@@ -6604,6 +6777,12 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
                             break;
                         case YT.PlayerState.PAUSED:
                             layer.triggerHandler('n2pause');
+                            if (this.state.continuePlay) {
+                                this.state.continuePlay = false;
+                                this.state.play = true;
+                            } else {
+                                this.state.play = false;
+                            }
                             break;
                         case YT.PlayerState.ENDED:
                             if (this.parameters.loop == 1) {
@@ -6614,6 +6793,7 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
                                     this.slider.sliderElement.trigger('mediaEnded', this.playerId);
                                 }
                                 layer.triggerHandler('n2stop');
+                                this.state.play = false;
                             }
                             break;
 
@@ -6632,14 +6812,15 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
 
             this.slider.sliderElement.on('SliderResize', $.proxy(this.onResize, this))
         }
-
     };
 
     FrontendItemYouTube.prototype.onReady = function () {
 
         var volume = parseFloat(this.parameters.volume);
-        if (volume >= 0) {
+        if (volume > 0) {
             this.setVolume(volume);
+        } else {
+            this.player.mute();
         }
 
         if (this.parameters.autoplay == 1) {
@@ -6650,7 +6831,9 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
             //pause video when slide changed
             this.slider.sliderElement.on("mainAnimationStart", $.proxy(function (e, mainAnimation, previousSlideIndex, currentSlideIndex) {
                 if ($.inArray(this.slide, this.slider.getVisibleSlides(this.slider.slides[currentSlideIndex])) == -1) {
-                    this.pause();
+                    this.setState('slide', false);
+                } else {
+                    this.setState('slide', true);
                 }
             }, this));
             if (parseInt(this.parameters.reset)) {
@@ -6662,6 +6845,13 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
             }
         }
         this.readyDeferred.resolve();
+
+        nextend.scrollTracker.add(this.playerElement, $.proxy(function () {
+            this.setState('scroll', true);
+        }, this), $.proxy(function () {
+            this.state.continuePlay = true;
+            this.setState('scroll', false);
+        }, this));
     };
 
     FrontendItemYouTube.prototype.onResize = function () {
@@ -6689,18 +6879,34 @@ N2Require('FrontendItemYouTube', [], [], function ($, scope, undefined) {
     FrontendItemYouTube.prototype.initAutoplay = function () {
 
         if (!this.isStatic) {
+            this.state.slide = false;
             //change slide
             this.slider.sliderElement.on("mainAnimationComplete", $.proxy(function (e, mainAnimation, previousSlideIndex, currentSlideIndex) {
                 if ($.inArray(this.slide, this.slider.getVisibleSlides(this.slider.slides[currentSlideIndex])) >= 0) {
-                    this.play();
+                    this.state.play = true;
+                    this.setState('slide', true);
+                } else {
+                    this.setState('slide', false);
                 }
             }, this));
 
             if ($.inArray(this.slide, this.slider.getVisibleSlides()) >= 0) {
-                this.play();
+                this.state.play = true;
+                this.setState('slide', true);
             }
         } else {
+            this.state.play = true;
+            this.setState('slide', true);
+        }
+    };
+
+    FrontendItemYouTube.prototype.setState = function (name, value) {
+        this.state[name] = value;
+
+        if (this.state.play && this.state.slide && this.state.scroll) {
             this.play();
+        } else {
+            this.pause();
         }
     };
 
